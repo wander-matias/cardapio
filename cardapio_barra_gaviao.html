@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cardápio — Pesque Pague Barra do Gavião</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1a14; color: #e8f0eb; min-height: 100vh; }
+
+  header { background: #0f1a14; border-bottom: 1px solid #1e3028; padding: 1rem 1.25rem; position: sticky; top: 0; z-index: 10; }
+  .logo-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .logo-icon { width: 36px; height: 36px; background: #1a8a50; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  h1 { font-size: 16px; font-weight: 700; color: #e8f0eb; }
+  h1 span { display: block; font-size: 11px; font-weight: 400; color: #7aad8a; margin-top: 1px; }
+
+  .search-wrap { position: relative; }
+  .search-wrap input {
+    width: 100%; padding: 11px 40px 11px 14px;
+    background: #1a2e22; border: 1px solid #2a4035;
+    border-radius: 10px; font-size: 15px; color: #e8f0eb;
+    outline: none;
+  }
+  .search-wrap input::placeholder { color: #5a7a65; }
+  .search-wrap input:focus { border-color: #1a8a50; }
+  .clear-btn { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #5a7a65; font-size: 18px; cursor: pointer; line-height: 1; padding: 0; display: none; }
+
+  main { padding: 1rem 1.25rem; }
+
+  .no-result { text-align: center; padding: 3rem 1rem; color: #5a7a65; font-size: 15px; }
+
+  .category { margin-bottom: 1.75rem; }
+  .cat-title {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: #1a8a50;
+    padding-bottom: 8px; border-bottom: 1px solid #1e3028;
+    margin-bottom: 2px;
+  }
+
+  .item { display: flex; align-items: flex-start; justify-content: space-between; padding: 11px 0; border-bottom: 1px solid #172418; gap: 12px; }
+  .item:last-child { border-bottom: none; }
+  .item-name { font-size: 15px; color: #d4e8d8; font-weight: 500; flex: 1; }
+  .item-desc { font-size: 12px; color: #5a7a65; margin-top: 2px; line-height: 1.4; }
+  .item-price { font-size: 16px; font-weight: 700; color: #1a8a50; white-space: nowrap; padding-top: 1px; }
+
+  mark { background: #1a5c35; color: #a8f0c0; border-radius: 3px; padding: 0 2px; }
+
+  .obs { background: #12241a; border: 1px solid #1e3028; border-radius: 8px; padding: 8px 12px; margin-bottom: 1.25rem; font-size: 12px; color: #5a7a65; }
+  .obs strong { color: #7aad8a; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-row">
+    <div class="logo-icon">🦅</div>
+    <h1>Pesque Pague Barra do Gavião <span>Barra do Gavião — Cardápio completo</span></h1>
+  </div>
+  <div class="search-wrap">
+    <input type="text" id="search" placeholder="Buscar prato, bebida ou acréscimo..." oninput="filter()" autocomplete="off" />
+    <button class="clear-btn" id="clear-btn" onclick="clearSearch()">×</button>
+  </div>
+</header>
+
+<main id="main"></main>
+
+<script>
+const data = [
+  { cat: 'Refeições — 500g', obs: null, items: [
+    { name: 'Tilápia', desc: 'Filés empanados — arroz, pirão e salada', price: 'R$ 89,90' },
+    { name: 'Tilápia ao Molho', desc: 'Tilápia empanada ao molho de tomate — arroz, purê e salada', price: 'R$ 89,90' },
+    { name: 'Moqueca', desc: 'Tilápia ensopada — arroz, pirão e farofa (não acompanha batata)', price: 'R$ 109,90' },
+    { name: 'Contra Filé', desc: 'Contra filé grelhado — arroz, vinagrete e farofa', price: 'R$ 99,90' },
+    { name: 'Picanha', desc: 'Picanha grelhada — arroz, vinagrete e farofa', price: 'R$ 119,90' },
+  ]},
+  { cat: 'Prato Executivo — 100g', obs: 'Embalagem de marmita: R$ 1,50 por embalagem.', items: [
+    { name: 'Tilápia Frita ou Grelhada', desc: 'Arroz, pirão, salada e batata', price: 'R$ 29,90' },
+    { name: 'Contra Filé', desc: 'Arroz, vinagrete, farofa e batata', price: 'R$ 39,90' },
+    { name: 'Picanha', desc: 'Arroz, vinagrete, farofa e batata', price: 'R$ 49,90' },
+  ]},
+  { cat: 'Porções', obs: 'No almoço (11h–15h) apenas porções de carne, peixe e batata. Meia porção = 60% do valor.', items: [
+    { name: 'Ceviche de Tilápia', desc: 'Tilápia marinada no limão, coentro e cebola roxa', price: 'R$ 35,00' },
+    { name: 'Ceviche de Manga', desc: 'Tilápia no limão e manga, cebola roxa, coentro e pimenta dedo de moça', price: 'R$ 39,90' },
+    { name: 'Torresmo de Tilápia', desc: 'Acompanha molho', price: 'R$ 69,90' },
+    { name: 'Contra Filé — porção', desc: 'Acompanha vinagrete e farofa', price: 'R$ 79,90' },
+    { name: 'Picanha — porção', desc: 'Acompanha vinagrete e farofa', price: 'R$ 99,90' },
+    { name: 'Pastel 6 unidades (carne ou queijo)', desc: 'Acompanha molho', price: 'R$ 39,90' },
+    { name: 'Batata Frita', desc: '', price: 'R$ 25,00' },
+  ]},
+  { cat: 'Acréscimos — Refeições', obs: null, items: [
+    { name: 'Arroz', desc: '', price: 'R$ 10,00' },
+    { name: 'Feijão', desc: '', price: 'R$ 8,00' },
+    { name: 'Farofa', desc: '', price: 'R$ 8,00' },
+    { name: 'Vinagrete', desc: '', price: 'R$ 10,00' },
+    { name: 'Purê de Batata', desc: '', price: 'R$ 12,00' },
+    { name: 'Pirão', desc: '', price: 'R$ 15,00' },
+    { name: 'Molho', desc: '', price: 'R$ 3,00' },
+  ]},
+  { cat: 'Acréscimos — Porções', obs: null, items: [
+    { name: 'Queijo', desc: '', price: 'R$ 5,00' },
+    { name: 'Bacon', desc: '', price: 'R$ 5,00' },
+    { name: 'Farofa', desc: '', price: 'R$ 5,00' },
+    { name: 'Vinagrete', desc: '', price: 'R$ 5,00' },
+    { name: 'Molho', desc: '', price: 'R$ 3,00' },
+  ]},
+  { cat: 'Bebidas não alcóolicas', obs: null, items: [
+    { name: 'Água sem gás', desc: '', price: 'R$ 4,00' },
+    { name: 'Água com gás', desc: '', price: 'R$ 5,00' },
+    { name: 'Guaraná lata', desc: '', price: 'R$ 7,00' },
+    { name: 'Coca lata', desc: '', price: 'R$ 7,00' },
+    { name: 'Coca 600ml', desc: '', price: 'R$ 9,00' },
+    { name: 'Coca 1L', desc: '', price: 'R$ 12,00' },
+    { name: 'Guaraná 1L', desc: '', price: 'R$ 10,00' },
+    { name: 'Guaravita', desc: '', price: 'R$ 5,00' },
+    { name: 'Limoneto', desc: '', price: 'R$ 9,00' },
+    { name: 'H2O', desc: '', price: 'R$ 9,00' },
+    { name: 'Shot Limão', desc: '', price: 'R$ 1,50' },
+    { name: 'Red Bull lata', desc: '', price: 'R$ 15,00' },
+    { name: 'Água de Coco', desc: '', price: 'R$ 7,00' },
+    { name: 'Suco Dell Vale 1L', desc: '', price: 'R$ 12,00' },
+    { name: 'Jarra de Suco 1,5L', desc: 'Laranja, abacaxi ou limão', price: 'R$ 30,00' },
+    { name: 'Copo de Suco 350ml', desc: 'Laranja, abacaxi ou limão', price: 'R$ 12,00' },
+  ]},
+  { cat: 'Bebidas alcóolicas', obs: null, items: [
+    { name: 'Brahma 600ml', desc: '', price: 'R$ 13,00' },
+    { name: 'Antártica 600ml', desc: '', price: 'R$ 13,00' },
+    { name: 'Amstel 600ml', desc: '', price: 'R$ 13,00' },
+    { name: 'Original 600ml', desc: '', price: 'R$ 15,00' },
+    { name: 'Heineken 600ml', desc: '', price: 'R$ 18,00' },
+    { name: 'Heineken Long Neck', desc: '', price: 'R$ 10,00' },
+    { name: 'Corona Long Neck', desc: '', price: 'R$ 12,00' },
+    { name: 'Budweiser Long Neck', desc: '', price: 'R$ 9,00' },
+    { name: 'Stella Long Neck', desc: '', price: 'R$ 12,00' },
+    { name: 'GT Long Neck', desc: '', price: 'R$ 15,00' },
+    { name: 'Stempel', desc: '', price: 'R$ 15,00' },
+    { name: 'Caipivodka / Caipirinha', desc: '', price: 'R$ 20,00' },
+    { name: 'Caipifruta', desc: '', price: 'R$ 30,00' },
+    { name: 'Dose Cachaça', desc: '', price: 'R$ 7,00' },
+    { name: 'Dose Smirnoff', desc: '', price: 'R$ 10,00' },
+    { name: 'Dose Campari', desc: '', price: 'R$ 15,00' },
+    { name: 'Dose Absolut', desc: '', price: 'R$ 20,00' },
+    { name: 'Taça de Vinho', desc: '', price: 'R$ 20,00' },
+  ]},
+];
+
+function hl(text, q) {
+  if (!q) return text;
+  const re = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
+  return text.replace(re, '<mark>$1</mark>');
+}
+
+function filter() {
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  document.getElementById('clear-btn').style.display = q ? 'block' : 'none';
+  render(q);
+}
+
+function clearSearch() {
+  document.getElementById('search').value = '';
+  document.getElementById('clear-btn').style.display = 'none';
+  render('');
+}
+
+function render(q) {
+  const main = document.getElementById('main');
+  let html = '';
+  let total = 0;
+
+  for (const cat of data) {
+    const filtered = q
+      ? cat.items.filter(i => (i.name + ' ' + i.desc).toLowerCase().includes(q))
+      : cat.items;
+    if (!filtered.length) continue;
+    total += filtered.length;
+
+    html += `<div class="category">`;
+    html += `<div class="cat-title">${cat.name}</div>`;
+    if (cat.obs && !q) html += `<div class="obs"><strong>Obs:</strong> ${cat.obs}</div>`;
+    for (const item of filtered) {
+      html += `<div class="item">
+        <div>
+          <div class="item-name">${hl(item.name, q)}</div>
+          ${item.desc ? `<div class="item-desc">${hl(item.desc, q)}</div>` : ''}
+        </div>
+        <div class="item-price">${item.price}</div>
+      </div>`;
+    }
+    html += `</div>`;
+  }
+
+  if (!total) html = `<div class="no-result">Nenhum item encontrado para "<strong>${q}</strong>"</div>`;
+  main.innerHTML = html;
+}
+
+render('');
+</script>
+</body>
+</html>
