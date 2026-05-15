@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cardápio — Barra do Gavião</title>
+<meta name="theme-color" content="#1a8a50">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Cardápio">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%231a8a50' rx='40'/%3E%3Ctext x='96' y='140' font-size='110' text-anchor='middle'%3E🦅%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Card%C3%A1pio%20Barra%20do%20Gavi%C3%A3o%22%2C%22short_name%22%3A%22Card%C3%A1pio%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230f1a14%22%2C%22theme_color%22%3A%22%231a8a50%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%2520viewBox%3D'0%25200%2520192%2520192'%253E%253Crect%2520width%3D'192'%2520height%3D'192'%2520fill%3D'%25231a8a50'%2520rx%3D'40'%2F%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f1a14; color: #e8f0eb; min-height: 100vh; padding-bottom: 70px; }
+
+  header { background: #0f1a14; border-bottom: 1px solid #1e3028; padding: .9rem 1.1rem; position: sticky; top: 0; z-index: 10; }
+  .logo-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .logo-icon { width: 34px; height: 34px; background: #1a8a50; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+  h1 { font-size: 15px; font-weight: 700; color: #e8f0eb; }
+  h1 span { display: block; font-size: 11px; font-weight: 400; color: #7aad8a; margin-top: 1px; }
+  .search-wrap { position: relative; }
+  .search-wrap input { width: 100%; padding: 10px 36px 10px 13px; background: #1a2e22; border: 1px solid #2a4035; border-radius: 10px; font-size: 15px; color: #e8f0eb; outline: none; }
+  .search-wrap input::placeholder { color: #5a7a65; }
+  .search-wrap input:focus { border-color: #1a8a50; }
+  .clear-btn { position: absolute; right: 11px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #5a7a65; font-size: 20px; cursor: pointer; line-height: 1; display: none; }
+
+  nav { position: fixed; bottom: 0; left: 0; right: 0; background: #0f1a14; border-top: 1px solid #1e3028; display: flex; z-index: 20; }
+  .nav-btn { flex: 1; padding: 10px 0 12px; background: none; border: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; color: #5a7a65; font-size: 10px; font-weight: 500; transition: color .15s; position: relative; }
+  .nav-btn.active { color: #1a8a50; }
+  .nav-btn svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .badge { position: absolute; top: 6px; right: calc(50% - 18px); background: #e05c2a; color: #fff; font-size: 10px; font-weight: 700; min-width: 17px; height: 17px; border-radius: 9px; display: flex; align-items: center; justify-content: center; padding: 0 4px; display: none; }
+
+  .page { display: none; padding: 1rem 1.1rem; }
+  .page.active { display: block; }
+
+  .category { margin-bottom: 1.6rem; }
+  .cat-title { font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: #1a8a50; padding-bottom: 7px; border-bottom: 1px solid #1e3028; margin-bottom: 2px; }
+  .obs { background: #12241a; border: 1px solid #1e3028; border-radius: 8px; padding: 7px 11px; margin-bottom: 10px; font-size: 11px; color: #5a7a65; }
+  .obs strong { color: #7aad8a; }
+
+  .item { display: flex; align-items: center; justify-content: space-between; padding: 11px 0; border-bottom: 1px solid #172418; gap: 10px; }
+  .item:last-child { border-bottom: none; }
+  .item-info { flex: 1; }
+  .item-name { font-size: 15px; color: #d4e8d8; font-weight: 500; }
+  .item-desc { font-size: 12px; color: #5a7a65; margin-top: 2px; line-height: 1.4; }
+  .item-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .item-price { font-size: 15px; font-weight: 700; color: #1a8a50; white-space: nowrap; }
+  .add-item-btn { width: 30px; height: 30px; border-radius: 50%; background: #1a8a50; border: none; color: #fff; font-size: 20px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 300; transition: transform .1s, background .1s; }
+  .add-item-btn:active { transform: scale(.9); background: #157a42; }
+
+  mark { background: #1a5c35; color: #a8f0c0; border-radius: 3px; padding: 0 2px; }
+  .no-result { text-align: center; padding: 3rem 1rem; color: #5a7a65; font-size: 15px; }
+
+  /* PEDIDO */
+  .pedido-empty { text-align: center; padding: 3rem 1rem; color: #5a7a65; }
+  .pedido-empty svg { width: 48px; height: 48px; stroke: #2a4035; margin-bottom: 12px; }
+  .pedido-empty p { font-size: 14px; }
+
+  .pedido-item { display: flex; align-items: center; gap: 10px; padding: 11px 0; border-bottom: 1px solid #172418; }
+  .pedido-item:last-child { border-bottom: none; }
+  .pedido-item-name { flex: 1; font-size: 14px; color: #d4e8d8; }
+  .pedido-item-price { font-size: 13px; color: #7aad8a; white-space: nowrap; }
+  .qty-ctrl { display: flex; align-items: center; gap: 8px; }
+  .qty-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid #2a4035; background: transparent; color: #e8f0eb; font-size: 18px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; font-weight: 300; }
+  .qty-btn:active { background: #1a2e22; }
+  .qty-num { font-size: 15px; font-weight: 600; color: #e8f0eb; min-width: 20px; text-align: center; }
+
+  .pedido-total-bar { background: #12241a; border: 1px solid #1e3028; border-radius: 12px; padding: 14px 16px; margin-top: 1rem; }
+  .total-row { display: flex; justify-content: space-between; align-items: center; }
+  .total-label { font-size: 13px; color: #7aad8a; }
+  .total-val { font-size: 22px; font-weight: 700; color: #1a8a50; }
+  .total-actions { display: flex; gap: 8px; margin-top: 12px; }
+  .btn-limpar { flex: 1; padding: 11px; border-radius: 10px; border: 1px solid #2a4035; background: transparent; color: #e8f0eb; font-size: 14px; cursor: pointer; }
+  .btn-limpar:active { background: #1a2e22; }
+  .btn-fechar { flex: 2; padding: 11px; border-radius: 10px; border: none; background: #1a8a50; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .btn-fechar:active { background: #157a42; }
+
+  .mesa-row { display: flex; align-items: center; gap: 8px; margin-bottom: 1rem; }
+  .mesa-row label { font-size: 13px; color: #7aad8a; white-space: nowrap; }
+  .mesa-row input { flex: 1; padding: 8px 12px; background: #1a2e22; border: 1px solid #2a4035; border-radius: 8px; font-size: 15px; color: #e8f0eb; outline: none; }
+  .mesa-row input:focus { border-color: #1a8a50; }
+
+  .pedido-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: .5rem; }
+  .pedido-header h2 { font-size: 16px; font-weight: 600; color: #e8f0eb; }
+  .qtd-total { font-size: 13px; color: #7aad8a; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-row">
+    <div class="logo-icon">🦅</div>
+    <h1>Pesque Pague Barra do Gavião <span>Cardápio completo</span></h1>
+  </div>
+  <div class="search-wrap" id="search-bar">
+    <input type="text" id="search" placeholder="Buscar item..." oninput="filter()" autocomplete="off">
+    <button class="clear-btn" id="clear-btn" onclick="clearSearch()">×</button>
+  </div>
+</header>
+
+<div id="page-cardapio" class="page active">
+  <div id="main"></div>
+</div>
+
+<div id="page-pedido" class="page">
+  <div class="mesa-row">
+    <label>Mesa / Nome:</label>
+    <input type="text" id="mesa-input" placeholder="Ex: Mesa 5 ou João">
+  </div>
+  <div id="pedido-content"></div>
+</div>
+
+<nav>
+  <button class="nav-btn active" id="nav-cardapio" onclick="showPage('cardapio')">
+    <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+    Cardápio
+  </button>
+  <button class="nav-btn" id="nav-pedido" onclick="showPage('pedido')">
+    <span class="badge" id="badge">0</span>
+    <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+    Pedido
+  </button>
+</nav>
+
+<script>
+const data = [
+  { cat: 'Refeições — 500g', obs: null, items: [
+    { name: 'Tilápia', desc: 'Filés empanados — arroz, pirão e salada', price: 'R$ 89,90', val: 89.90 },
+    { name: 'Tilápia ao Molho', desc: 'Molho de tomate — arroz, purê e salada', price: 'R$ 89,90', val: 89.90 },
+    { name: 'Moqueca', desc: 'Tilápia ensopada — arroz, pirão e farofa (sem batata)', price: 'R$ 109,90', val: 109.90 },
+    { name: 'Contra Filé', desc: 'Grelhado — arroz, vinagrete e farofa', price: 'R$ 99,90', val: 99.90 },
+    { name: 'Picanha', desc: 'Grelhada — arroz, vinagrete e farofa', price: 'R$ 119,90', val: 119.90 },
+  ]},
+  { cat: 'Prato Executivo — 100g', obs: 'Embalagem de marmita: R$ 1,50 por embalagem.', items: [
+    { name: 'Tilápia Frita ou Grelhada', desc: 'Arroz, pirão, salada e batata', price: 'R$ 29,90', val: 29.90 },
+    { name: 'Contra Filé Executivo', desc: 'Arroz, vinagrete, farofa e batata', price: 'R$ 39,90', val: 39.90 },
+    { name: 'Picanha Executivo', desc: 'Arroz, vinagrete, farofa e batata', price: 'R$ 49,90', val: 49.90 },
+  ]},
+  { cat: 'Porções', obs: 'Almoço (11h–15h): só porções de carne, peixe e batata. Meia porção = 60% do valor.', items: [
+    { name: 'Ceviche de Tilápia', desc: 'Limão, coentro e cebola roxa', price: 'R$ 35,00', val: 35.00 },
+    { name: 'Ceviche de Manga', desc: 'Limão, manga, cebola roxa, coentro e pimenta', price: 'R$ 39,90', val: 39.90 },
+    { name: 'Torresmo de Tilápia', desc: 'Acompanha molho', price: 'R$ 69,90', val: 69.90 },
+    { name: 'Contra Filé — porção', desc: 'Vinagrete e farofa', price: 'R$ 79,90', val: 79.90 },
+    { name: 'Picanha — porção', desc: 'Vinagrete e farofa', price: 'R$ 99,90', val: 99.90 },
+    { name: 'Pastel 6un (carne ou queijo)', desc: 'Acompanha molho', price: 'R$ 39,90', val: 39.90 },
+    { name: 'Batata Frita', desc: '', price: 'R$ 25,00', val: 25.00 },
+  ]},
+  { cat: 'Acréscimos — Refeições', obs: null, items: [
+    { name: 'Arroz', desc: '', price: 'R$ 10,00', val: 10.00 },
+    { name: 'Feijão', desc: '', price: 'R$ 8,00', val: 8.00 },
+    { name: 'Farofa', desc: '', price: 'R$ 8,00', val: 8.00 },
+    { name: 'Vinagrete', desc: '', price: 'R$ 10,00', val: 10.00 },
+    { name: 'Purê de Batata', desc: '', price: 'R$ 12,00', val: 12.00 },
+    { name: 'Pirão', desc: '', price: 'R$ 15,00', val: 15.00 },
+    { name: 'Molho', desc: '', price: 'R$ 3,00', val: 3.00 },
+  ]},
+  { cat: 'Acréscimos — Porções', obs: null, items: [
+    { name: 'Queijo', desc: '', price: 'R$ 5,00', val: 5.00 },
+    { name: 'Bacon', desc: '', price: 'R$ 5,00', val: 5.00 },
+    { name: 'Farofa (porção)', desc: '', price: 'R$ 5,00', val: 5.00 },
+    { name: 'Vinagrete (porção)', desc: '', price: 'R$ 5,00', val: 5.00 },
+    { name: 'Molho (porção)', desc: '', price: 'R$ 3,00', val: 3.00 },
+  ]},
+  { cat: 'Bebidas não alcóolicas', obs: null, items: [
+    { name: 'Água sem gás', desc: '', price: 'R$ 4,00', val: 4.00 },
+    { name: 'Água com gás', desc: '', price: 'R$ 5,00', val: 5.00 },
+    { name: 'Guaraná lata', desc: '', price: 'R$ 7,00', val: 7.00 },
+    { name: 'Coca lata', desc: '', price: 'R$ 7,00', val: 7.00 },
+    { name: 'Coca 600ml', desc: '', price: 'R$ 9,00', val: 9.00 },
+    { name: 'Coca 1L', desc: '', price: 'R$ 12,00', val: 12.00 },
+    { name: 'Guaraná 1L', desc: '', price: 'R$ 10,00', val: 10.00 },
+    { name: 'Guaravita', desc: '', price: 'R$ 5,00', val: 5.00 },
+    { name: 'Limoneto', desc: '', price: 'R$ 9,00', val: 9.00 },
+    { name: 'H2O', desc: '', price: 'R$ 9,00', val: 9.00 },
+    { name: 'Shot Limão', desc: '', price: 'R$ 1,50', val: 1.50 },
+    { name: 'Red Bull lata', desc: '', price: 'R$ 15,00', val: 15.00 },
+    { name: 'Água de Coco', desc: '', price: 'R$ 7,00', val: 7.00 },
+    { name: 'Suco Dell Vale 1L', desc: '', price: 'R$ 12,00', val: 12.00 },
+    { name: 'Jarra de Suco 1,5L', desc: 'Laranja, abacaxi ou limão', price: 'R$ 30,00', val: 30.00 },
+    { name: 'Copo de Suco 350ml', desc: 'Laranja, abacaxi ou limão', price: 'R$ 12,00', val: 12.00 },
+  ]},
+  { cat: 'Bebidas alcóolicas', obs: null, items: [
+    { name: 'Brahma 600ml', desc: '', price: 'R$ 13,00', val: 13.00 },
+    { name: 'Antártica 600ml', desc: '', price: 'R$ 13,00', val: 13.00 },
+    { name: 'Amstel 600ml', desc: '', price: 'R$ 13,00', val: 13.00 },
+    { name: 'Original 600ml', desc: '', price: 'R$ 15,00', val: 15.00 },
+    { name: 'Heineken 600ml', desc: '', price: 'R$ 18,00', val: 18.00 },
+    { name: 'Heineken Long Neck', desc: '', price: 'R$ 10,00', val: 10.00 },
+    { name: 'Corona Long Neck', desc: '', price: 'R$ 12,00', val: 12.00 },
+    { name: 'Budweiser Long Neck', desc: '', price: 'R$ 9,00', val: 9.00 },
+    { name: 'Stella Long Neck', desc: '', price: 'R$ 12,00', val: 12.00 },
+    { name: 'GT Long Neck', desc: '', price: 'R$ 15,00', val: 15.00 },
+    { name: 'Stempel', desc: '', price: 'R$ 15,00', val: 15.00 },
+    { name: 'Caipivodka / Caipirinha', desc: '', price: 'R$ 20,00', val: 20.00 },
+    { name: 'Caipifruta', desc: '', price: 'R$ 30,00', val: 30.00 },
+    { name: 'Dose Cachaça', desc: '', price: 'R$ 7,00', val: 7.00 },
+    { name: 'Dose Smirnoff', desc: '', price: 'R$ 10,00', val: 10.00 },
+    { name: 'Dose Campari', desc: '', price: 'R$ 15,00', val: 15.00 },
+    { name: 'Dose Absolut', desc: '', price: 'R$ 20,00', val: 20.00 },
+    { name: 'Taça de Vinho', desc: '', price: 'R$ 20,00', val: 20.00 },
+  ]},
+];
+
+let pedido = [];
+
+function fmt(v) { return 'R$ ' + v.toFixed(2).replace('.', ','); }
+
+function totalQtd() { return pedido.reduce((s,i)=>s+i.qty,0); }
+function totalVal() { return pedido.reduce((s,i)=>s+i.val*i.qty,0); }
+
+function updateBadge() {
+  const q = totalQtd();
+  const b = document.getElementById('badge');
+  b.textContent = q;
+  b.style.display = q > 0 ? 'flex' : 'none';
+}
+
+function addToPedido(name, price, val) {
+  const ex = pedido.find(i=>i.name===name);
+  if (ex) ex.qty++;
+  else pedido.push({name, price, val, qty:1});
+  updateBadge();
+  const btn = event.currentTarget;
+  btn.style.transform = 'scale(1.3)';
+  setTimeout(()=>btn.style.transform='',200);
+}
+
+function changeQty(name, delta) {
+  const idx = pedido.findIndex(i=>i.name===name);
+  if (idx === -1) return;
+  pedido[idx].qty += delta;
+  if (pedido[idx].qty <= 0) pedido.splice(idx, 1);
+  updateBadge();
+  renderPedido();
+}
+
+function limparPedido() {
+  if (!pedido.length) return;
+  if (confirm('Limpar todo o pedido?')) {
+    pedido = [];
+    document.getElementById('mesa-input').value = '';
+    updateBadge();
+    renderPedido();
+  }
+}
+
+function fecharPedido() {
+  const mesa = document.getElementById('mesa-input').value.trim() || 'Mesa não informada';
+  const lines = pedido.map(i=>`${i.qty}x ${i.name} — ${fmt(i.val*i.qty)}`).join('\n');
+  const total = fmt(totalVal());
+  alert(`✅ Pedido fechado!\n\n${mesa}\n\n${lines}\n\nTotal: ${total}`);
+}
+
+function renderPedido() {
+  const el = document.getElementById('pedido-content');
+  if (!pedido.length) {
+    el.innerHTML = `<div class="pedido-empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+      <p>Pedido vazio.<br>Adicione itens pelo cardápio.</p>
+    </div>`;
+    return;
+  }
+  const qtd = totalQtd();
+  let html = `<div class="pedido-header"><h2>Itens do pedido</h2><span class="qtd-total">${qtd} item${qtd>1?'s':''}</span></div>`;
+  html += pedido.map(it=>`
+    <div class="pedido-item">
+      <div class="pedido-item-name">${it.name}<br><span class="pedido-item-price">${fmt(it.val*it.qty)}</span></div>
+      <div class="qty-ctrl">
+        <button class="qty-btn" onclick="changeQty('${it.name.replace(/'/g,"\\'")}', -1)">−</button>
+        <span class="qty-num">${it.qty}</span>
+        <button class="qty-btn" onclick="changeQty('${it.name.replace(/'/g,"\\'")}', 1)">+</button>
+      </div>
+    </div>`).join('');
+  html += `<div class="pedido-total-bar">
+    <div class="total-row">
+      <span class="total-label">Total</span>
+      <span class="total-val">${fmt(totalVal())}</span>
+    </div>
+    <div class="total-actions">
+      <button class="btn-limpar" onclick="limparPedido()">🗑 Limpar</button>
+      <button class="btn-fechar" onclick="fecharPedido()">✅ Fechar pedido</button>
+    </div>
+  </div>`;
+  el.innerHTML = html;
+}
+
+function showPage(p) {
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.getElementById('nav-'+p).classList.add('active');
+  const sb = document.getElementById('search-bar');
+  sb.style.display = p === 'cardapio' ? 'block' : 'none';
+  if (p === 'pedido') renderPedido();
+}
+
+function hl(text, q) {
+  if (!q) return text;
+  const re = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
+  return text.replace(re, '<mark>$1</mark>');
+}
+
+function filter() {
+  const q = document.getElementById('search').value.trim().toLowerCase();
+  document.getElementById('clear-btn').style.display = q ? 'block' : 'none';
+  render(q);
+}
+
+function clearSearch() {
+  document.getElementById('search').value = '';
+  document.getElementById('clear-btn').style.display = 'none';
+  render('');
+}
+
+function render(q) {
+  const main = document.getElementById('main');
+  let html = '';
+  let total = 0;
+  for (const cat of data) {
+    const filtered = q ? cat.items.filter(i=>(i.name+' '+i.desc).toLowerCase().includes(q)) : cat.items;
+    if (!filtered.length) continue;
+    total += filtered.length;
+    html += `<div class="category"><div class="cat-title">${cat.name}</div>`;
+    if (cat.obs && !q) html += `<div class="obs"><strong>Obs:</strong> ${cat.obs}</div>`;
+    for (const item of filtered) {
+      const safeName = item.name.replace(/'/g,"\\'");
+      html += `<div class="item">
+        <div class="item-info">
+          <div class="item-name">${hl(item.name,q)}</div>
+          ${item.desc?`<div class="item-desc">${hl(item.desc,q)}</div>`:''}
+        </div>
+        <div class="item-right">
+          <div class="item-price">${item.price}</div>
+          <button class="add-item-btn" onclick="addToPedido('${safeName}','${item.price}',${item.val})">+</button>
+        </div>
+      </div>`;
+    }
+    html += `</div>`;
+  }
+  if (!total) html = `<div class="no-result">Nenhum item encontrado.</div>`;
+  main.innerHTML = html;
+}
+
+render('');
+</script>
+</body>
+</html>
